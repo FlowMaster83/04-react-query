@@ -45,8 +45,6 @@ function App() {
     setIsLoading(false)
   }
 
-  console.log('test');
-
   return (
     <div className={css.app}>
 
