@@ -13,6 +13,7 @@ export const fetchMovies = async (query: string):Promise<Movie[]> => {
         const config = {
             params: {
                 query,
+                page: 1,
             },
             headers: {
                 Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`
@@ -20,7 +21,7 @@ export const fetchMovies = async (query: string):Promise<Movie[]> => {
         };
         
       const response = await axios.get<MovieResponse>('https://api.themoviedb.org/3/search/movie', config);
-      // console.log(response.data);
+        console.log(response.data);
       return response.data.results
     } catch (error) {
       console.error(error);
