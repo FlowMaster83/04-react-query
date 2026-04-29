@@ -8,12 +8,11 @@ export interface MovieResponse {
     total_results: number
 }
 
-export const fetchMovies = async (query: string):Promise<Movie[]> => {
-      try {
+export const fetchMovies = async (query: string, page: number):Promise<MovieResponse> => {
         const config = {
             params: {
                 query,
-                page: 1,
+                page,
             },
             headers: {
                 Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`
@@ -21,10 +20,6 @@ export const fetchMovies = async (query: string):Promise<Movie[]> => {
         };
         
       const response = await axios.get<MovieResponse>('https://api.themoviedb.org/3/search/movie', config);
-        console.log(response.data);
-      return response.data.results
-    } catch (error) {
-      console.error(error);
-      return[]
-  }
+
+      return response.data
 }

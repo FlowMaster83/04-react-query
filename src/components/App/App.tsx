@@ -1,5 +1,6 @@
 import toast, { Toaster } from 'react-hot-toast'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 
 import type { Movie } from '../../types/movie'
 import { fetchMovies } from '../../services/movieService'
@@ -9,13 +10,30 @@ import MovieModal from '../MovieModal/MovieModal'
 import Loader from '../Loader/Loader'
 import ErrorMessage from '../ErrorMessage/ErrorMessage'
 import css from './App.module.css'
+import ReactPaginate from '../ReactPaginate/ReactPaginate'
 
 function App() {
 
-  const [movies, setMovies] = useState<Movie[]>([])
+  const [searchQuery, setSearchQuery] = useState<string>('')
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isError, setIsError] = useState(false)
+  const [page, setPage] = useState(1)
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['movies', searchQuery, page],
+    queryFn: () => fetchMovies(searchQuery, page),
+    enabled: searchQuery.length > 0,
+    placeholderData: (prev) => prev
+  })
+
+  useEffect(() => {
+    if (data && data.results.length === 0 && searchQuery) {
+      toast('No movies found for your request.')
+    }
+  }, [data, searchQuery])
+
+  const handlePageClick = (nextPage: number) => {
+    setPage(nextPage);
+  };
 
   const openModal = (movie: Movie) => {
     setSelectedMovie(movie)
@@ -25,24 +43,9 @@ function App() {
     setSelectedMovie(null)
   }
 
-  const handleSearch = async (query: string) => {
-    setIsLoading(true)
-    setIsError(false)
-    setMovies([])
-
-    try {
-      const data = await fetchMovies(query)
-
-      if (data.length === 0) {
-        toast('No movies found for your request.')
-      }
-      setMovies(data)
-    } catch (error) {
-      setIsError(true)
-      console.error(error);
-    }
-
-    setIsLoading(false)
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setPage(1)
   }
 
   return (
@@ -50,12 +53,15 @@ function App() {
 
       <SearchBar onSubmit={handleSearch} />
 
+      {data && data.total_pages > 1 && (<ReactPaginate totalPages={data.total_pages} currentPage={page} onPageChange={handlePageClick} />)}
+
       {isError && <ErrorMessage />}
       {isLoading && <Loader />}
 
-      {!isLoading && !isError && movies.length > 0 && (
-        <MovieGrid movies={movies} onSelect={openModal} />
+      {data && data.results.length > 0 && (
+        <MovieGrid movies={data.results} onSelect={openModal} />
       )}
+
 
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={closeModal} />

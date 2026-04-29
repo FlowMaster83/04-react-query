@@ -1,7 +1,7 @@
 import ReactPaginateModule from "react-paginate";
 import type { ReactPaginateProps } from "react-paginate";
 import type { ComponentType } from "react";
-import css from "./Pagination.module.css";
+import css from '../App/App.module.css'
 
 type ModuleWithDefault<T> = { default: T };
 
@@ -14,6 +14,7 @@ interface PaginationProps {
     currentPage: number;
     onPageChange: (nextPage: number) => void;
 }
+
 
 export default function Pagination({ totalPages, currentPage, onPageChange }: PaginationProps) {
     return (
