@@ -18,7 +18,7 @@ function App() {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
   const [page, setPage] = useState(1)
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isFetching, isError, isSuccess } = useQuery({
     queryKey: ['movies', searchQuery, page],
     queryFn: () => fetchMovies(searchQuery, page),
     enabled: searchQuery.length > 0,
@@ -56,12 +56,11 @@ function App() {
       {data && data.total_pages > 1 && (<ReactPaginate pageCount={data.total_pages} forcePage={page} onPageChange={handlePageClick} />)}
 
       {isError && <ErrorMessage />}
-      {isLoading && <Loader />}
+      {isFetching && <Loader />}
 
-      {data && data.results.length > 0 && (
+      {isSuccess && data && data.results.length > 0 && (
         <MovieGrid movies={data.results} onSelect={openModal} />
       )}
-
 
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={closeModal} />
