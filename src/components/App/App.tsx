@@ -53,7 +53,7 @@ function App() {
 
       <SearchBar onSubmit={handleSearch} />
 
-      {data && data.total_pages > 1 && (<ReactPaginate totalPages={data.total_pages} currentPage={page} onPageChange={handlePageClick} />)}
+      {data && data.total_pages > 1 && (<ReactPaginate pageCount={data.total_pages} forcePage={page} onPageChange={handlePageClick} />)}
 
       {isError && <ErrorMessage />}
       {isLoading && <Loader />}
